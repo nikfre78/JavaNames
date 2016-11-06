@@ -7,6 +7,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -16,11 +19,13 @@ public class Names {
 	private HashMap<String, Integer> firstNames;
 	private HashMap<String, Integer> surNames;
 	
-	public Names(String filter, String evenOdd)
-	{
+	public Names(String filter, String evenOdd) {
+		
+		// Create two HashMaps to hold the names and quantity of the names
 		firstNames = new HashMap<String, Integer>();
 		surNames = new HashMap<String, Integer>();
 		
+		// Read the names from the file names.json
 		JSONParser parser = new JSONParser();  
 		  
 		  try {
@@ -35,6 +40,8 @@ public class Names {
 				  String firstname = (String)name.get("firstname");
 				  String surname = (String)name.get("surname");
 				  
+				  // If a filter is provided - only add a persons first name and surname if any of them
+				  // matches the filter.
 				  if (filter.length() > 0) {
 					  if (firstname.indexOf(filter) == -1 &&
 							  surname.indexOf(filter) == -1) {
@@ -46,8 +53,10 @@ public class Names {
 				  addNameToMap(surname.trim(), surNames);
 			  }
 			  
-			  if (evenOdd.length() > 0)
-			  {
+			  // If even/odd is provided
+			  if (evenOdd.length() > 0) {
+				  // Create two temporary HashMaps to hold the names with
+				  // even/odd occurrences.
 				  HashMap<String, Integer> tmpFirstNames = new HashMap<String, Integer>();
 				  HashMap<String, Integer> tmpSurNames = new HashMap<String, Integer>();
 				  
@@ -67,47 +76,49 @@ public class Names {
 					  }
 				  }
 				  
+				  // Replace all names with the temporary ones
 				  firstNames = tmpFirstNames;
 				  surNames = tmpSurNames;
 			  }
 		  }
 		  catch (FileNotFoundException e) {
-			  e.printStackTrace();
+			  e.printStackTrace(); // TODO: Snyggare felmeddelande
 		  }
 		  catch (IOException e) {
-			  e.printStackTrace();  
+			  e.printStackTrace(); // TODO: Snyggare felmeddelande  
 		  }
 		  catch (org.json.simple.parser.ParseException e) {
-			  e.printStackTrace();
+			  e.printStackTrace(); // TODO: Snyggare felmeddelande
 		  }
 	}
 	
-	public int getFirstNamesCount()
-	{
+	public int getFirstNamesCount() {
 		return firstNames.size();
 	}
 	
-	public int getSurNamesCount()
-	{
+	public int getSurNamesCount() {
 		return surNames.size();
 	}
 	
-	public List<String> getListOfTopFirstNames(int top) {
+	public List<Entry<String, Integer>> getListOfTopFirstNames(int top) {
 		return getListOfTopNames(firstNames, top);
 	}
 	
-	public List<String> getListOfTopSurNames(int top) {
+	public List<Entry<String, Integer>> getListOfTopSurNames(int top) {
 		return getListOfTopNames(surNames, top);
 	}
 	
-	private List<String> getListOfTopNames(HashMap<String, Integer> names, int top) {
-		// TODO: Sort by frequency and return the top x
-		List<String> namesList = new ArrayList<String>(names.keySet());
-		Collections.sort(namesList);
-		if (namesList.size() > top) {
-			return namesList.subList(0, top);
+	private List<Entry<String, Integer>> getListOfTopNames(HashMap<String, Integer> names, int top) {
+		// Sort the specified HashMap by value and return the top x
+		List<Entry<String, Integer>> result = names.entrySet().stream().sorted(Map.Entry.comparingByValue(Collections.reverseOrder())).collect(Collectors.toList());
+		
+		// If the result has more names then parameter top - return a sublist
+		if (result.size() > top) {
+			return result.subList(0, top);
 		}
-		return namesList;
+		
+		// otherwise return the complete result
+		return result;
 	}
 	
 	public List<String> getListOfFirstNamesSorted(boolean sortAscending) {
@@ -119,6 +130,8 @@ public class Names {
 	}
 	
 	private List<String> getListSorted(HashMap<String, Integer> names, boolean sortAscending) {
+		// Add the names to a list and sort it.
+		// Let parameter sortAscending decide if the result should be sorted ascending or descending.
 		List<String> namesList = new ArrayList<String>(names.keySet());
 		Collections.sort(namesList);
 		
@@ -129,16 +142,18 @@ public class Names {
 		return namesList;
 	}
 	
-	private void addNameToMap(String name, Map<String, Integer> map)
-	{
+	private void addNameToMap(String name, Map<String, Integer> map) {
 		int count;
 		if (map.containsKey(name)) {
+			// If the name already is added - get the count and increase by one
 			count = map.get(name);
 			count++;
 		}
 		else {
+			// If the name wasn't added - start with 1
 			count = 1;
 		}
+		// Add/replace the name with its current count in the HashMap
 		map.put(name, count);
 	}
 }
