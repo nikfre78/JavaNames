@@ -41,7 +41,8 @@ public class Program {
 		try {
 			System.in.read();
 		} catch (IOException e) {
-			e.printStackTrace(); // TODO: Snyggare felmeddelande
+			System.out.println("Exception while reading the key...");
+			e.printStackTrace();
 		}
 	}
 }

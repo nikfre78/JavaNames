@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -82,13 +81,16 @@ public class Names {
 			  }
 		  }
 		  catch (FileNotFoundException e) {
-			  e.printStackTrace(); // TODO: Snyggare felmeddelande
+			  System.out.println("The file files/names.json is not found!");
+			  e.printStackTrace();
 		  }
 		  catch (IOException e) {
-			  e.printStackTrace(); // TODO: Snyggare felmeddelande  
+			  System.out.println("An IOException occured when loading names data!");
+			  e.printStackTrace();
 		  }
 		  catch (org.json.simple.parser.ParseException e) {
-			  e.printStackTrace(); // TODO: Snyggare felmeddelande
+			  System.out.println("An exception occured while parsing data in the file files/names.json!");
+			  e.printStackTrace();
 		  }
 	}
 	
